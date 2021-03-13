@@ -77,6 +77,7 @@ class Technician:
             self.technician_program[from_day] = status
 
     def __reason_of_absence(self, day):
+        '''Έλεγχος αν κάποιος θέλει να πάρει άδεια 2 φορές στον ίδιο μήνα'''
         if day in self.days_at_ka:
             return "ΚΑ", len(self.days_at_ka)
         elif day in self.days_at_school:

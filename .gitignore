@@ -1,7 +1,7 @@
 program.txt
 program_data.json
 program_data_test.json
-techicians_data.json
+technicians_data.json
 venv/
 .idea/
 __pycache__/
