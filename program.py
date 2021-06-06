@@ -1,40 +1,33 @@
-import json
 import calendar
 from day import Day
 from technician import Technician
 
 
 class Program:
-    '''ΚΑΙ ΕΔΩ ΘΑ ΠΡΕΠΕΙ ΝΑ ΠΕΡΝΑΕΙ ΩΣ ΠΑΡΑΜΕΤΡΟΣ ΤΟ ΑΡΧΕΙΟ ΜΕ ΤΑ PROGRAM DATA'''
-    def __init__(self, technicians):
+
+    def __init__(self, program_data_dict, technicians):
         self.technicians = technicians
-        try:
-            with open("program_data_test.json", encoding="utf-8") as f:
-                program_data_dict = json.load(f)
-        except FileNotFoundError:
-            print("Το αρχείο δεν βρέθηκε")
+        self.full_program = bool(program_data_dict["full_program"])
+        self.number_of_technicians = program_data_dict["number_of_technicians"]
+        self.active_technicians = program_data_dict["active_technicians"]
+        self.month = program_data_dict["month"]
+        self.year = program_data_dict["year"]
+        self.first_day_of_month, self.days_of_month = calendar.monthrange(self.year, self.month)
+        self.days_of_month += 1
+        self.sequence = program_data_dict["sequence"]
+
+        if self.number_of_technicians - self.active_technicians >= 1:
+            self.technicians_out_of_order = program_data_dict["technicians_out_of_order"]
         else:
-            self.full_program = bool(program_data_dict["full_program"])
-            self.number_of_technicians = program_data_dict["number_of_technicians"]
-            self.active_technicians = program_data_dict["active_technicians"]
-            self.month = program_data_dict["month"]
-            self.year = program_data_dict["year"]
-            self.first_day_of_month, self.days_of_month = calendar.monthrange(self.year, self.month)
-            self.days_of_month += 1
-            self.sequence = program_data_dict["sequence"]
+            self.technicians_out_of_order = []
 
-            if self.number_of_technicians - self.active_technicians >= 1:
-                self.technicians_out_of_order = program_data_dict["technicians_out_of_order"]
-            else:
-                self.technicians_out_of_order = []
+        if not self.full_program:
+            self.empty_slots = program_data_dict["empty_slots"]
+        else:
+            self.empty_slots = []
 
-            if not self.full_program:
-                self.empty_slots = program_data_dict["empty_slots"]
-            else:
-                self.empty_slots = []
-
-            self.next_month_out_of_order_technicians = []
-            self.guards_program = []
+        self.next_month_out_of_order_technicians = []
+        self.guards_program = []
 
     def initialization(self):
         day = self.first_day_of_month
@@ -52,9 +45,7 @@ class Program:
             if self.guards_program[day].technician_id == "-":
                 return day
             day += 1
-        else:
-            # Next available day is in the next month
-            pass
+
 
     def __next_technician(self, technician_id):
         for technician in self.technicians:
@@ -72,6 +63,16 @@ class Program:
 
     def day_is_empty(self, day):
         if self.guards_program[day].technician_id == "-":
+            return True
+        return False
+
+    def day_must_be_empty(self, day):
+        if self.guards_program[day].technician_id == "/":
+            return True
+        return False
+
+    def day_has_technician(self, day):
+        if not self.day_is_empty(day) and not self.day_must_be_empty(day):
             return True
         return False
 

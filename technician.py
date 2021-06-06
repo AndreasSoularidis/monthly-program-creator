@@ -77,8 +77,24 @@ class Technician:
             self.technician_program[from_day] = status
 
     def __reason_of_absence(self, day):
+        '''Έλεγχος αν κάποιος θέλει να πάρει άδεια 2 φορές στον ίδιο μήνα'''
         if day in self.days_at_ka:
-            return "ΚΑ", len(self.days_at_ka)
+            # Technician has one period of KA in this month
+            if -1 not in self.days_at_ka:
+                return "ΚΑ", len(self.days_at_ka)
+            else: # Technician has more than one period of KA in this month
+                start = 0
+                try:
+                    while True:
+                        end = self.days_at_ka.index(-1, start)
+                        if day in self.days_at_ka[start:end]:
+                            return "ΚΑ", len(self.days_at_ka[start:end])
+                        start = end + 1
+                except ValueError: # last ka of the month
+                    print("into Except")
+                    end = len(self.days_at_ka) - 1
+                    if day in self.days_at_ka[start:]:
+                            return "ΚΑ", len(self.days_at_ka[start:end]) + 1 
         elif day in self.days_at_school:
             return "ΦΠ", len(self.days_at_school)
         elif day in self.days_at_holidays:
@@ -101,9 +117,11 @@ class Technician:
             return reason, absence_from, absence_from + days_of_absence
         else:
             absence_from = day
-            absence = (day, day + days_of_absence - 1, reason)
+            absence_to = day + days_of_absence - 1
+            next_guard = absence_to + 1
+            absence = (day, absence_to, reason)
             self.absence_days.append(absence)
-            return reason, absence_from, day + days_of_absence
+            return reason, absence_from, next_guard
 
     def __str__(self):
         return f"{self.grade} ({self.specialty}) {self.surname} {self.name}"
