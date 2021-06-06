@@ -45,9 +45,7 @@ class Program:
             if self.guards_program[day].technician_id == "-":
                 return day
             day += 1
-        else:
-            # Next available day is in the next month, so update program data
-            pass
+
 
     def __next_technician(self, technician_id):
         for technician in self.technicians:
@@ -65,6 +63,16 @@ class Program:
 
     def day_is_empty(self, day):
         if self.guards_program[day].technician_id == "-":
+            return True
+        return False
+
+    def day_must_be_empty(self, day):
+        if self.guards_program[day].technician_id == "/":
+            return True
+        return False
+
+    def day_has_technician(self, day):
+        if not self.day_is_empty(day) and not self.day_must_be_empty(day):
             return True
         return False
 

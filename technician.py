@@ -102,9 +102,11 @@ class Technician:
             return reason, absence_from, absence_from + days_of_absence
         else:
             absence_from = day
-            absence = (day, day + days_of_absence - 1, reason)
+            absence_to = day + days_of_absence - 1
+            next_guard = absence_to + 1
+            absence = (day, absence_to, reason)
             self.absence_days.append(absence)
-            return reason, absence_from, day + days_of_absence
+            return reason, absence_from, next_guard
 
     def __str__(self):
         return f"{self.grade} ({self.specialty}) {self.surname} {self.name}"

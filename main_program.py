@@ -2,8 +2,6 @@ import json
 from program import Program
 from technician import Technician
 
-''' Θα πρέπει το πρόγραμμα όταν δημιουργεί τη σειρά για τον επόμενο μήνα
-να μην λαμβάνει υπόψη στη σειρά τυχόν κενές ημέρες'''
 
 
 def read_technicians_data(file):
@@ -76,7 +74,7 @@ def main():
     else:
         if not program.full_program:
             program.set_empty_days()
-        # First place technician to program according who are out of order
+        # First, place technician to program according who are out of order
         if program.has_technicians_out_of_order():
             for i in range(len(program.technicians_out_of_order)):
                 tech_id = program.technicians_out_of_order[i]["technician_id"]
@@ -99,61 +97,63 @@ def main():
         for tech in program.sequence:
             next_free_day = program.next_available_day(0)
             technician = program.find_technician_by_id(tech)
-            while not technician.is_available(next_free_day):
+            next_guard = next_free_day
+            reason = ""
+            available = True
+            while not technician.is_available(next_guard):
                 # Calculate return day and update technician program
-                reason, from_day, next_guard = technician.calculate_next_guard(next_free_day)
+                reason, from_day, next_guard = technician.calculate_next_guard(next_guard)
                 technician.update_technician_program(reason, from_day, next_guard - 1)
-                previous_day = next_guard
+                available = False
+
+            # Place technician to next guard
+            if next_guard < program.days_of_month:
+                program.guards_program[next_guard].technician_id = technician.tech_id
+                print(f"Day {next_guard} technician {technician.tech_id}")
+                technician.update_technician_program("ΥΠ", next_guard)
+                if not available:
+                    program.active_technicians -= 1
+            else:  # if next guard is in the next month check it
+                program.add_technician_to_next_month(technician.tech_id, next_guard,
+                                                     next_guard - program.days_of_month, reason)
+                program.active_technicians -= 1
+
+        # Place technicians the following days until the end of the month
+        next_day = program.next_available_day(0)
+        for day in range(next_day, program.days_of_month):
+            if program.day_must_be_empty(day):
+                continue
+            if program.day_has_technician(day):
+                program.active_technicians += 1
+            while program.day_is_empty(day):
+                technician = program.find_next_technician(day)
+                next_guard = day
+                reason = ""
+                available = True
                 while not technician.is_available(next_guard):
-                    reason, from_day, next_guard = technician.calculate_next_guard(previous_day)
+                    # Calculate return day and update technician program
+                    reason, from_day, next_guard = technician.calculate_next_guard(next_guard)
+                    if reason == "ΦΠ" and day in technician.days_at_school:
+                        offs = min(day - technician.days_at_school[0], program.active_technicians)
+                        next_guard += offs
                     technician.update_technician_program(reason, from_day, next_guard - 1)
-                # Place technician to next guard after absence
-                if next_guard <= program.days_of_month:
+                    if next_guard < program.days_of_month and program.guards_program[next_guard].technician_id != "-":
+                        next_guard += 1
+
+                    available = False
+
+                # Place technician to next guard
+                if next_guard < program.days_of_month:
                     program.guards_program[next_guard].technician_id = technician.tech_id
                     technician.update_technician_program("ΥΠ", next_guard)
+                    print(f"Day {next_guard} technician {technician.tech_id}")
+                    if not available:
+                        program.active_technicians -= 1
                 else:  # if next guard is in the next month check it
-                    program.add_technician_to_next_month(technician.tech_id, next_free_day,
+                    print(next_guard, next_guard - program.days_of_month)
+                    program.add_technician_to_next_month(technician.tech_id, day,
                                                          next_guard - program.days_of_month, reason)
-                # Reduce the number of available technicians by one
-                program.active_technicians -= 1
-                break
-            else:
-                program.guards_program[next_free_day].technician_id = technician.tech_id
-                technician.update_technician_program("ΥΠ", next_free_day)
-
-        # Place techicians the following days until the end of the month
-        next_day = program.next_available_day(0)
-
-        for day in range(next_day, program.days_of_month):
-            if program.day_is_empty(day):
-                technician = program.find_next_technician(day)
-                while not technician.is_available(day):
-                    # calculate day of return
-                    reason, from_day, next_guard = technician.calculate_next_guard(day)
-                    technician.update_technician_program(reason, from_day, next_guard)
-                    previous_day = next_guard
-                    while not technician.is_available(next_guard):
-                        reason, from_day, next_guard = technician.calculate_next_guard(previous_day)
-                        technician.update_technician_program(reason, from_day, next_guard)
-                    # calculate possible day off after the practice
-                    if technician.days_at_school:
-                        offs = day - technician.days_at_school[0]
-                        next_guard += offs
-                    # Place technician to the next guard
-                    if next_guard < program.days_of_month:
-                        program.guards_program[next_guard].technician_id = technician.tech_id
-                        technician.update_technician_program("ΥΠ", next_guard)
-                    else:  # if next guard is in the next month check it
-                        program.add_technician_to_next_month(technician.tech_id, from_day,
-                                                             next_guard - program.days_of_month + 1, reason)
-                    # Reduce the number of available technicians by one
                     program.active_technicians -= 1
-                    # Find the next technician in queue
-                    technician = program.find_next_technician(day)
-                program.guards_program[day].technician_id = technician.tech_id
-                technician.update_technician_program("ΥΠ", day)
-            elif program.guards_program[day].technician_id != "/":
-                program.active_technicians += 1
 
         print(program)
 
