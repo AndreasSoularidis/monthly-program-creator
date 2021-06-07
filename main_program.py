@@ -44,8 +44,15 @@ def store_program_data(program):
         year += 1
         month = 1
     next_month_order = []
-    for day in range(len(program.guards_program) - program.active_technicians, len(program.guards_program)):
-        next_month_order.append(program.guards_program[day].technician_id)
+    technician_counter = 0
+    day = len(program.guards_program) - 1
+    while technician_counter < program.active_technicians:
+        if program.guards_program[day].technician_id != '/':
+            next_month_order.append(program.guards_program[day].technician_id)
+            technician_counter += 1
+        day -= 1
+    next_month_order.reverse()
+
     program_data_dict = {
         "full_program": 0,
         "number_of_technicians": program.number_of_technicians,
