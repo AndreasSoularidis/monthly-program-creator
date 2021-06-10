@@ -11,8 +11,7 @@ def read_technicians_data(file):
             technicians_list_dict = json.load(f)
 
         for technician in technicians_list_dict:
-            new_technician = Technician()
-            new_technician.from_dict(technician)
+            new_technician = Technician(technician)
             technicians.append(new_technician)
     except FileNotFoundError:
         raise Exception("Fatal Error! Technicians Data file not found.")
@@ -33,7 +32,7 @@ def store_technicians_data(technicians):
     list_to_store = []
     for technician in technicians:
         list_to_store.append(technician.to_dict())
-    with open("technicians_data.json", "w", encoding="utf-8") as f:
+    with open("technicians_data_test.json", "w", encoding="utf-8") as f:
         json.dump(list_to_store, f)
 
 
@@ -162,6 +161,7 @@ def main():
                                                          next_guard - program.days_of_month, reason)
                     program.active_technicians -= 1
         program.calculate_number_of_guards()
+        program.calculate_ka_days()
         print(program)
 
         # Εκτύπωση προγράμματος τεχνικών
