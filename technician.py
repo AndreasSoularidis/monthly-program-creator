@@ -41,6 +41,7 @@ class Technician:
         self.days_at_school = technician_dict["days_at_school"]
         self.days_at_hospital = technician_dict["days_at_hospital"]
         self.days_at_holidays = technician_dict["days_at_holidays"]
+        self.guards_per_month = technician_dict["guards_per_month"]
         self.technician_program = ["off" for _ in range(32)]
         self.absence_days = []
 
@@ -55,8 +56,10 @@ class Technician:
             "days_at_ka": self.days_at_ka,
             "days_at_school": self.days_at_school,
             "days_at_hospital": self.days_at_hospital,
-            "days_at_holidays": self.days_at_holidays
+            "days_at_holidays": self.days_at_holidays,
+            "guards_per_month": self.guards_per_month  
         }
+
         return technician_dict
 
     def is_available(self, day):
@@ -122,6 +125,9 @@ class Technician:
             absence = (day, absence_to, reason)
             self.absence_days.append(absence)
             return reason, absence_from, next_guard
+
+    def calculate_total_guards(self):
+        return sum(self.guards_per_month)
 
     def __str__(self):
         return f"{self.grade} ({self.specialty}) {self.surname} {self.name}"
