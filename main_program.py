@@ -116,7 +116,7 @@ def main():
             # Place technician to next guard
             if next_guard < program.days_of_month:
                 program.guards_program[next_guard].technician_id = technician.tech_id
-                print(f"Day {next_guard} technician {technician.tech_id}")
+                # print(f"Day {next_guard} technician {technician.tech_id}")
                 technician.update_technician_program("ΥΠ", next_guard)
                 if not available:
                     program.active_technicians -= 1
@@ -153,15 +153,15 @@ def main():
                 if next_guard < program.days_of_month:
                     program.guards_program[next_guard].technician_id = technician.tech_id
                     technician.update_technician_program("ΥΠ", next_guard)
-                    print(f"Day {next_guard} technician {technician.tech_id}")
+                    # print(f"Day {next_guard} technician {technician.tech_id}")
                     if not available:
                         program.active_technicians -= 1
                 else:  # if next guard is in the next month check it
-                    print(next_guard, next_guard - program.days_of_month)
+                    # print(next_guard, next_guard - program.days_of_month)
                     program.add_technician_to_next_month(technician.tech_id, day,
                                                          next_guard - program.days_of_month, reason)
                     program.active_technicians -= 1
-
+        program.calculate_number_of_guards()
         print(program)
 
         # Εκτύπωση προγράμματος τεχνικών
@@ -184,6 +184,7 @@ def main():
             if user_choice == 1:
                 program.store_program()
                 store_program_data(program)
+                store_technicians_data(technicians)
                 print("Το πρόγραμμα και τα στοιχεία του προγράμματος αποθηκεύτηκαν με επιτυχία")
             break
 

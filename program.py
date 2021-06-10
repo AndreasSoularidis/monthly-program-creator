@@ -99,6 +99,15 @@ class Program:
         }
         self.next_month_out_of_order_technicians.append(technician_dict)
 
+    def calculate_number_of_guards(self):
+        for technician in self.technicians:
+            counter = 0
+            for day in technician.technician_program:
+                if day == "ΥΠ":
+                    counter += 1
+            technician.guards_per_month.append(counter)
+
+
     def __repr__(self):
         program = f"Full program: {self.full_program}\n"
         program += f"Number of technicians: {self.number_of_technicians}\n"
@@ -132,7 +141,6 @@ class Program:
                     break
             program += f"{tech}  "
 
-        #program += "\n" + str(self.next_month_out_of_order_technicians)
         program += "\n\nΆδειες\n\n"
         for technician in self.technicians:
             if technician.has_kind_of_holidays():
@@ -158,6 +166,10 @@ class Program:
                     else:
                         program += ", "
                 program += "\n"
+        program += "\n\nΣτατιστικά Στοιχεία\n\n"
+        program += f"{'Τεχνικός':<30}{'Τρέχων Μήνας':<15}{'Σύνολο Υπηρεσιών':<15}\n"
+        for technician in self.technicians:
+            program += f"{technician.grade + ' (' + technician.specialty + ') ' + technician.surname + ' ' + technician.name[0] + '.':<36}{technician.guards_per_month[-1]:<15}{sum(technician.guards_per_month):<15}\n"
         return program
 
     def store_program(self):
