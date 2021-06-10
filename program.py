@@ -29,6 +29,12 @@ class Program:
         self.next_month_out_of_order_technicians = []
         self.guards_program = []
 
+        if self.month == 1:
+            for technician in self.technicians:
+                technician.previous_years_ka = sum(technician.ka_per_month)
+                technician.ka_per_month = []
+                technician.guards_per_month = []
+
     def initialization(self):
         day = self.first_day_of_month
         for guard_day in range(self.days_of_month):
@@ -106,6 +112,14 @@ class Program:
                 if day == "ΥΠ":
                     counter += 1
             technician.guards_per_month.append(counter)
+    
+    def calculate_ka_days(self):
+        for technician in self.technicians:
+            counter = 0
+            for day in technician.technician_program:
+                if day == "ΚΑ":
+                    counter += 1
+            technician.ka_per_month.append(counter)
 
 
     def __repr__(self):
@@ -167,9 +181,9 @@ class Program:
                         program += ", "
                 program += "\n"
         program += "\n\nΣτατιστικά Στοιχεία\n\n"
-        program += f"{'Τεχνικός':<30}{'Τρέχων Μήνας':<15}{'Σύνολο Υπηρεσιών':<15}\n"
+        program += f"{'Τεχνικός':<30}{'Τρέχων Μήνας':<15}{'Σύνολο Υπηρεσιών':<20}{'Υπόλοιπο Κανονικής Άδειας':<20}\n"
         for technician in self.technicians:
-            program += f"{technician.grade + ' (' + technician.specialty + ') ' + technician.surname + ' ' + technician.name[0] + '.':<36}{technician.guards_per_month[-1]:<15}{sum(technician.guards_per_month):<15}\n"
+            program += f"{technician.grade + ' (' + technician.specialty + ') ' + technician.surname + ' ' + technician.name[0] + '.':<36}{technician.guards_per_month[-1]:<15}{sum(technician.guards_per_month):<25}{technician.calculate_rest_days_of_ka()}\n"
         return program
 
     def store_program(self):
