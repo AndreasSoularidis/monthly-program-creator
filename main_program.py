@@ -56,6 +56,7 @@ def store_program_data(program):
         "full_program": 0,
         "number_of_technicians": program.number_of_technicians,
         "active_technicians": program.active_technicians,
+        "guest_tehnician": program.guest_tehnician,
         "month": month,
         "year": year,
         "sequence": next_month_order,
@@ -80,7 +81,16 @@ def main():
     else:
         if not program.full_program:
             program.set_empty_days()
-        # First, place technician to program according who are out of order
+        # First, place guest technician to program according to their desire days
+        if program.guest_tehnician != -1:
+            technician = technicians[program.guest_tehnician]
+            for day in technician.willing_days:
+                program.guards_program[day].technician_id = technician.tech_id
+                technician.update_technician_program("ΥΠ", day)
+            technician.calculate_guest_technician_program()
+
+
+        # Then, place technician to program according who are out of order
         if program.has_technicians_out_of_order():
             for i in range(len(program.technicians_out_of_order)):
                 tech_id = program.technicians_out_of_order[i]["technician_id"]
@@ -129,7 +139,7 @@ def main():
         for day in range(next_day, program.days_of_month):
             if program.day_must_be_empty(day):
                 continue
-            if program.day_has_technician(day):
+            if program.day_has_technician(day) and program.guards_program[day].technician_id != program.guest_tehnician:
                 program.active_technicians += 1
             while program.day_is_empty(day):
                 technician = program.find_next_technician(day)

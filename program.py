@@ -10,6 +10,7 @@ class Program:
         self.full_program = bool(program_data_dict["full_program"])
         self.number_of_technicians = program_data_dict["number_of_technicians"]
         self.active_technicians = program_data_dict["active_technicians"]
+        self.guest_tehnician = program_data_dict["guest_tehnician"]
         self.month = program_data_dict["month"]
         self.year = program_data_dict["year"]
         self.first_day_of_month, self.days_of_month = calendar.monthrange(self.year, self.month)
@@ -64,7 +65,7 @@ class Program:
             if counter == self.active_technicians:
                 return self.__next_technician(self.guards_program[day].technician_id)
             day -= 1
-            if self.guards_program[day].technician_id != "/":
+            if self.guards_program[day].technician_id != "/" and self.guards_program[day].technician_id != self.guest_tehnician:
                 counter += 1
 
     def day_is_empty(self, day):

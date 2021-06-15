@@ -3,6 +3,7 @@ to_do_list.txt
 program_data.json
 program_data_test.json
 technicians_data.json
+technicians_data_test.json
 venv/
 .idea/
 __pycache__/
